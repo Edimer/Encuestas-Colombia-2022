@@ -1,0 +1,116 @@
+---
+title: "Intención de voto elecciones presidenciales"
+subtitle: "Colombia 2022"
+author: "Edimer David Jaramillo"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float:
+      smooth_scroll: false
+      collapsed: false
+    df_print: paged
+    code_folding: hide
+    css: estilo.css 
+    theme: cosmo
+    highlight: kate
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE,
+                      warning = FALSE, fig.align = "center")
+
+library(tidyverse)
+library(readxl)
+library(janitor)
+library(DT)
+library(rvest)
+
+theme_set(theme_minimal())
+```
+
+# Bibliotecas
+
+```{r}
+library(tidyverse)
+library(readxl)
+library(janitor)
+library(DT)
+library(rvest)
+```
+
+# Funciones
+
+- [Consultar código 1: `clean_data_wikipedia.R`]()
+- [Consultar código 2: `clean_candidate.R`]()
+
+```{r}
+source("clean_data_wikipedia.R")
+source("clean_candidate.R")
+```
+
+
+# Intención de voto
+
+## Fuente original
+
+- [Fuente: Anexo:Sondeos de intención de voto para las elecciones presidenciales de Colombia de 2022](https://es.wikipedia.org/wiki/Anexo:Sondeos_de_intenci%C3%B3n_de_voto_para_las_elecciones_presidenciales_de_Colombia_de_2022)
+
+## Web Scraping
+
+- Lectura de información contenida en la página web suministrada.
+
+```{r}
+url <- "https://es.wikipedia.org/wiki/Anexo:Sondeos_de_intenci%C3%B3n_de_voto_para_las_elecciones_presidenciales_de_Colombia_de_2022"
+
+web_info <- url %>% 
+  read_html()
+web_info
+```
+
+- Accediendo a la información que está en el *nodo* **body**.
+
+```{r}
+web_info %>% 
+  html_node("body")
+```
+
+- Se podría generar una base datos con la información de todas las tablas que están presentes en el *body* de la página web. 
+
+```{r}
+web_info %>% 
+  html_node("body") %>% 
+  html_table()
+```
+
+- La aproximación anterior junta todas las tablas en un solo `data.frame`, pero como no todas las tablas tienen la misma estructura sería más fácil de manipular si se extraen de manera individual y luego se busca la manera correcta de unirlas.
+
+```{r}
+lista_tablas <-
+  web_info %>%
+  html_table(header = TRUE)
+
+lista_tablas <- lista_tablas[-c(1)]
+
+data_encuestas <-
+  lista_tablas %>%
+  map(.f = clean_data) %>%
+  bind_rows() %>%
+  mutate(across(
+    c(margen_de_error, alfredo_saade:rafael_nieto_loaiza),
+    clean_candidate
+  ),
+  across(
+    c(margen_de_error, alfredo_saade:rafael_nieto_loaiza),
+    as.numeric
+  ))
+
+data_encuestas
+```
+
+## Exportando datos
+
+```{r, eval=FALSE}
+write_csv(x = data_encuestas, file = "EncuestasWikipedia-Colombia2022.csv")
+```
+
