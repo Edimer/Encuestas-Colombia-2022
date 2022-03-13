@@ -57,12 +57,12 @@ library(plotly)
 
 # Funciones
 
-- [**Consultar código 1:** `explor_candidate.R`]()
-- [**Consultar código 2:** `infer1.R`]()
-- [**Consultar código 3:** `infer2.R`]()
-- [**Consultar código 4:** `infer3.R`]()
-- [**Consultar código 5:** `infer4.R`]()
-- [**Consultar código 6:** `infer5.R`]()
+- [**Consultar código 1:** `explor_candidate.R`](https://github.com/Edimer/Encuestas-Colombia-2022/blob/main/functions-R/explor_candidate.R)
+- [**Consultar código 2:** `infer1.R`](https://github.com/Edimer/Encuestas-Colombia-2022/blob/main/functions-R/infer1.R)
+- [**Consultar código 3:** `infer2.R`](https://github.com/Edimer/Encuestas-Colombia-2022/blob/main/functions-R/infer2.R)
+- [**Consultar código 4:** `infer3.R`](https://github.com/Edimer/Encuestas-Colombia-2022/blob/main/functions-R/infer3.R)
+- [**Consultar código 5:** `infer4.R`](https://github.com/Edimer/Encuestas-Colombia-2022/blob/main/functions-R/infer4.R)
+- [**Consultar código 6:** `infer5.R`](https://github.com/Edimer/Encuestas-Colombia-2022/blob/main/functions-R/infer5.R)
 
 ```{r}
 source("../functions-R/explor_candidate.R")
