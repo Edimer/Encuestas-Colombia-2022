@@ -29,5 +29,5 @@ library(plotly)
 - [Statistical Inference via Data Science - A ModernDive into R and the Tidyverse](https://moderndive.com/index.html)
 
 <center>
-</img src = "https://d33wubrfki0l68.cloudfront.net/19dafd10a53785f1407566a1f3a09b29a6bab847/1e5f0/images/logos/book_cover.png" />
+<img src = "https://d33wubrfki0l68.cloudfront.net/19dafd10a53785f1407566a1f3a09b29a6bab847/1e5f0/images/logos/book_cover.png" />
 </center>
