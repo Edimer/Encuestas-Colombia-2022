@@ -1,6 +1,6 @@
 ---
-title: "Intención de voto elecciones presidenciales"
-subtitle: "Colombia 2022"
+title: "Intención de voto elecciones presidenciales Colombia 2022"
+subtitle: "Extracción de información"
 author: "Edimer David Jaramillo"
 date: "`r Sys.Date()`"
 output:
@@ -41,14 +41,13 @@ library(rvest)
 
 # Funciones
 
-- [Consultar código 1: `clean_data_wikipedia.R`]()
-- [Consultar código 2: `clean_candidate.R`]()
+- [Consultar código 1: `clean_data_wikipedia.R`](https://github.com/Edimer/Encuestas-Colombia-2022/blob/main/clean_data_wikipedia.R)
+- [Consultar código 2: `clean_candidate.R`](https://github.com/Edimer/Encuestas-Colombia-2022/blob/main/clean_candidate.R)
 
 ```{r}
 source("clean_data_wikipedia.R")
 source("clean_candidate.R")
 ```
-
 
 # Intención de voto
 
