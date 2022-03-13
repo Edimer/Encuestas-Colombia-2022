@@ -1,0 +1,607 @@
+---
+title: "Intención de voto elecciones presidenciales Colombia 2022"
+subtitle: "Exploración estadística"
+author: "Edimer David Jaramillo"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float:
+      smooth_scroll: false
+      collapsed: false
+    df_print: paged
+    code_folding: hide
+    css: estilo.css 
+    theme: cosmo
+    highlight: kate
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE,
+                      warning = FALSE, fig.align = "center")
+
+library(tidyverse)
+library(readxl)
+library(janitor)
+library(DT)
+library(rvest)
+library(lubridate)
+library(cowplot)
+library(ggsci)
+library(splines)
+library(qqplotr)
+library(broom)
+library(infer)
+library(plotly)
+
+theme_set(theme_minimal())
+```
+
+# Bibliotecas
+
+```{r}
+library(tidyverse)
+library(readxl)
+library(janitor)
+library(DT)
+library(rvest)
+library(lubridate)
+library(cowplot)
+library(ggsci)
+library(splines)
+library(qqplotr)
+library(broom)
+library(infer)
+library(plotly)
+```
+
+# Funciones
+
+- [**Consultar código 1:** `explor_candidate.R`]()
+- [**Consultar código 2:** `infer1.R`]()
+- [**Consultar código 3:** `infer2.R`]()
+- [**Consultar código 4:** `infer3.R`]()
+- [**Consultar código 5:** `infer4.R`]()
+- [**Consultar código 6:** `infer5.R`]()
+
+```{r}
+source("../functions-R/explor_candidate.R")
+source("../functions-R/infer1.R")
+source("../functions-R/infer2.R")
+source("../functions-R/infer3.R")
+source("../functions-R/infer4.R")
+source("../functions-R/infer5.R")
+```
+
+# Consultas presidenciales
+
+- Este documento tiene como objetivo estimar la proporción esperada de votantes (intención de voto) para los candidatos que aspiran a la presidencia de Colombia en el año 2022 y que participarán de las consultas en marzo del mismo año. Se conformó la base de datos con 63 encuestas suministradas por diferentes fuentes (medios de comunicación) y alojadas en [Wikipedia.](https://es.wikipedia.org/wiki/Anexo:Sondeos_de_intenci%C3%B3n_de_voto_para_las_elecciones_presidenciales_de_Colombia_de_2022).
+- Para extraer la información desde *Wikipedia* se usó la biblioteca [`rvest`](https://rvest.tidyverse.org/). Esta biblioteca permite implementar técnicas de [*Web scraping*](https://es.wikipedia.org/wiki/Web_scraping) con R.
+- Todo el código de este y otros documentos está alojado en [Github.](https://github.com/Edimer/Encuestas-Colombia-2022)
+
+
+## Candidatos
+
+<center>
+<img src = "https://cnnespanol.cnn.com/wp-content/uploads/2022/03/Tarjetones-consultas-internas.jpg?quality=100&strip=info" width = 550/>
+</center>
+
+## Datos
+
+- En total hay 62 encuestas.
+
+```{r}
+datos <- read_csv("../data/EncuestasWikipedia-Colombia2022.csv") %>%
+  mutate(fecha_publicacion = as.Date(fecha_publicacion, format = "%d-%m-%Y")) %>% 
+  select(fuente:margen_de_error,
+         alfredo_saade,
+         arelis_uriana,
+         camilo_romero,
+         francia_marquez,
+         gustavo_petro,
+         
+         alejandro_gaviria,
+         carlos_amaya,
+         jorge_enrique_robledo,
+         juan_manuel_galan,
+         sergio_fajardo,
+         
+         alejandro_char,
+         aydee_lizarazo,
+         david_barguil,
+         enrique_penalosa,
+         federico_gutierrez,
+         
+         blanco,
+         ninguno,
+         ns_nr
+         )
+datos
+```
+
+## Firmas encuestadoras
+
+- El siguiente gráfico muestra el total de encuestas realizadas por cada firma encuestadora (**A**) y el total de encuestas realizadas por cada firma encuestadora por año (**B**).
+
+```{r, fig.width=8, fig.height=9}
+g1 <-
+  datos %>%
+  count(firma_encuestadora) %>%
+  ggplot(aes(x = fct_reorder(firma_encuestadora, n), y = n)) +
+  geom_segment(aes(
+    x = fct_reorder(firma_encuestadora, n),
+    xend = fct_reorder(firma_encuestadora, n),
+    y = 0,
+    yend = n - 0.5
+  ),
+  color = "dodgerblue2") +
+  geom_point(size = 6,
+             alpha = 0.5,
+             color = "dodgerblue2") +
+  geom_text(aes(label = n), size = 2.7) +
+  coord_flip() +
+  labs(x = "Firma encuestadora",
+       y = "Total de encuestas")
+
+g2 <-
+  datos %>%
+  mutate(year = year(fecha_publicacion)) %>%
+  count(firma_encuestadora, year) %>%
+  filter(!is.na(year)) %>%
+  mutate(year = as.factor(year)) %>%
+  ggplot(aes(x = year, y = n, fill = firma_encuestadora)) +
+  geom_col(position = "dodge") +
+  scale_fill_igv() +
+  labs(x = "Año",
+       y = "Total de encuestas",
+       fill = "",
+       color = "") +
+  theme(legend.position = "top")
+  
+plot_grid(g1,
+          g2,
+          ncol = 1,
+          align = "hv",
+          labels = list("A)", "B)"))
+```
+
+## Tamaño muestral y error
+
+- El siguiente gráfico permite ver la distribución del tamaño muestral (**`muestra`**) y el error de las encuestas (**`margen_de_error`**) para cada firma encuestadora.
+
+```{r, fig.width=8, fig.height=4}
+datos %>% 
+  select(firma_encuestadora, muestra, margen_de_error) %>% 
+  pivot_longer(cols = -firma_encuestadora) %>% 
+  ggplot(aes(x = firma_encuestadora, y = value, fill = firma_encuestadora)) +
+  facet_wrap(~name, scales = "free") +
+  geom_boxplot(show.legend = FALSE) +
+  labs(x = "Firma encuestadora", y = "") +
+  scale_fill_igv() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+
+## Encuestas por candidato y coalición
+
+- En el gráfico **A** se muestra el total de encuestas en las que ha sido evaluada la intención de voto para cada candidato. En el gráfico **B** se  observa el total de encuestas en las que se ha medido la intención de voto para cada coalición en cada año.
+
+```{r, fig.width=8, fig.height=9}
+g1 <- datos %>%
+  select(alfredo_saade:federico_gutierrez) %>%
+  pivot_longer(cols = everything()) %>%
+  group_by(name) %>%
+  summarise(total_encuestas = sum(!is.na(value))) %>%
+  ungroup() %>%
+  ggplot(aes(x = fct_reorder(name, total_encuestas), y = total_encuestas)) +
+  geom_segment(aes(
+    x = fct_reorder(name, total_encuestas),
+    xend = fct_reorder(name, total_encuestas),
+    y = 0,
+    yend = total_encuestas - 1.1
+  ),
+  color = "dodgerblue2") +
+  geom_point(size = 6,
+             alpha = 0.5,
+             color = "dodgerblue2") +
+  geom_text(aes(label = total_encuestas), size = 2.7) +
+  coord_flip() +
+  labs(x = "",
+       y = "Total de encuestas")
+
+g2 <- datos %>%
+  mutate(year = year(fecha_publicacion)) %>%
+  select(alfredo_saade:federico_gutierrez, year) %>%
+  pivot_longer(cols = -year) %>%
+  mutate(coalicion = if_else(
+    name %in% c(
+      "alfredo_saade",
+      "arelis_uriana",
+      "camilo_romero",
+      "francia_marquez",
+      "gustavo_petro"
+    ),
+    true = "Pacto Histórico",
+    false = if_else(
+      name %in% c(
+        "alejandro_gaviria",
+        "carlos_amaya",
+        "jorge_enrique_robledo",
+        "juan_manuel_galan",
+        "sergio_fajardo"
+      ),
+      true = "Centro Esperanza",
+      false = "Equipo por Colombia"
+    )
+  )) %>%
+  group_by(coalicion, year) %>%
+  summarise(total_encuestas = sum(!is.na(value))) %>%
+  ungroup() %>%
+  filter(!is.na(year)) %>%
+  ggplot(aes(
+    x = year,
+    y = total_encuestas,
+    fill = coalicion
+  )) +
+  geom_col(position = "dodge") +
+  scale_fill_igv() +
+  scale_color_igv() +
+  labs(x = "",
+       y = "Total de encuestas",
+       fill = "",
+       color = "") +
+  theme(legend.position = "top")
+
+plot_grid(g1,
+          g2,
+          ncol = 1,
+          align = "hv",
+          labels = list("A)", "B)"))
+```
+
+## Intención de voto
+
+### Variabilidad temporal  
+
+- **Gráfico A:** distribución de la intención de voto de cada coalición para cada año.
+- **Gráfico B:** tendencia de la **mediana**  de la intención de voto para cada coalición.
+- **Gráfico C:** tendencia suavizada ([*modelo GAM*](https://en.wikipedia.org/wiki/Generalized_additive_model)) de la **mediana** de intención de voto para cada coalición.
+- **Gráfico D:** tendencia de la **mediana** de la intención de voto para los tres candidatos que lideran (según resultados de encuesta) cada coalición.
+- **Nota:** algunos candidatos aparecen recientemente por su tardía vinculación a la precandidatura presidencial.
+
+```{r, fig.width=8, fig.height=6}
+g1 <-
+  datos %>%
+  mutate(year = year(fecha_publicacion)) %>%
+  select(alfredo_saade:federico_gutierrez, year) %>%
+  pivot_longer(cols = -year) %>%
+  mutate(coalicion = if_else(
+    name %in% c(
+      "alfredo_saade",
+      "arelis_uriana",
+      "camilo_romero",
+      "francia_marquez",
+      "gustavo_petro"
+    ),
+    true = "Pacto Histórico",
+    false = if_else(
+      name %in% c(
+        "alejandro_gaviria",
+        "carlos_amaya",
+        "jorge_enrique_robledo",
+        "juan_manuel_galan",
+        "sergio_fajardo"
+      ),
+      true = "Centro Esperanza",
+      false = "Equipo por Colombia"
+    )
+  )) %>%
+  filter(!is.na(year)) %>%
+  mutate(year = as.factor(year)) %>%
+  ggplot(aes(
+    x = year,
+    y = value,
+    fill = coalicion,
+    color = coalicion
+  )) +
+  geom_boxplot(alpha = 0.6) +
+  scale_fill_igv() +
+  scale_color_igv() +
+  labs(x = "Año",
+       y = "Intención de voto (%)",
+       fill = "",
+       color = "") +
+  theme(legend.position = "top") 
+
+g2 <-
+  datos %>%
+  select(alfredo_saade:federico_gutierrez, fecha_publicacion) %>%
+  pivot_longer(cols = -fecha_publicacion) %>%
+  mutate(coalicion = if_else(
+    name %in% c(
+      "alfredo_saade",
+      "arelis_uriana",
+      "camilo_romero",
+      "francia_marquez",
+      "gustavo_petro"
+    ),
+    true = "Pacto Histórico",
+    false = if_else(
+      name %in% c(
+        "alejandro_gaviria",
+        "carlos_amaya",
+        "jorge_enrique_robledo",
+        "juan_manuel_galan",
+        "sergio_fajardo"
+      ),
+      true = "Centro Esperanza",
+      false = "Equipo por Colombia"
+    )
+  )) %>%
+  group_by(fecha_publicacion, coalicion) %>%
+  summarise(mediana = median(value, na.rm = TRUE)) %>%
+  ungroup() %>%
+  ggplot(aes(x = fecha_publicacion, y = mediana, color = coalicion)) +
+  geom_line() +
+  scale_color_igv() +
+  labs(x = "Fecha", y = "Intención de voto (%)",
+       color = "") +
+  theme(legend.position = "top")
+
+g3 <-
+  datos %>%
+  select(alfredo_saade:federico_gutierrez, fecha_publicacion) %>%
+  pivot_longer(cols = -fecha_publicacion) %>%
+  mutate(coalicion = if_else(
+    name %in% c(
+      "alfredo_saade",
+      "arelis_uriana",
+      "camilo_romero",
+      "francia_marquez",
+      "gustavo_petro"
+    ),
+    true = "Pacto Histórico",
+    false = if_else(
+      name %in% c(
+        "alejandro_gaviria",
+        "carlos_amaya",
+        "jorge_enrique_robledo",
+        "juan_manuel_galan",
+        "sergio_fajardo"
+      ),
+      true = "Centro Esperanza",
+      false = "Equipo por Colombia"
+    )
+  )) %>%
+  group_by(fecha_publicacion, coalicion) %>%
+  summarise(mediana = median(value, na.rm = TRUE)) %>%
+  ungroup() %>%
+  ggplot(aes(x = fecha_publicacion, y = mediana, color = coalicion)) +
+  geom_smooth(method = "gam",
+              formula = y ~ ns(x, df = 5),
+              se = FALSE) +
+  scale_color_igv() +
+  labs(x = "Fecha", y = "Intención de voto (%)",
+       color = "") +
+  theme(legend.position = "top")
+
+g4 <-
+  datos %>%
+  select(alfredo_saade:federico_gutierrez, fecha_publicacion) %>%
+  pivot_longer(cols = -fecha_publicacion) %>%
+  group_by(fecha_publicacion, name) %>%
+  summarise(mediana = median(value, na.rm = TRUE)) %>%
+  ungroup() %>%
+  filter(name %in% c("gustavo_petro", "sergio_fajardo", "federico_gutierrez")) %>%
+  ggplot(aes(x = fecha_publicacion, y = mediana, color = name)) +
+  geom_line() +
+  scale_color_igv() +
+  labs(x = "Fecha", y = "Intención de voto (%)",
+       color = "") +
+  theme(legend.position = "top")
+
+plot_grid(g1,
+          g2,
+          g3,
+          g4,
+          ncol = 2,
+          nrow = 2,
+          align = "hv",
+          labels = list("A)", "B)", "C)", "D)"))
+```
+
+### Exploratorio por candidato {.tabset .tabset-fade .tabset-pills}
+
+- **Gráfico A:** distribución de la intención de voto del candidato.
+- **Gráfico B:** tendencia suavizada ([*modelo GAM*](https://en.wikipedia.org/wiki/Generalized_additive_model)) de la intención de voto a través del tiempo.
+- **Gráfico C:** promedio y desviación estándar de la intención de voto por año.
+- **Gráfico D:** ranking de promedio de intención de voto.
+
+
+
+#### Gustavo Petro
+
+```{r, fig.width=8, fig.height=5}
+explor_candidate(data = datos, candidate = "gustavo_petro")
+```
+
+#### Sergio Fajardo
+
+```{r, fig.width=8, fig.height=5}
+explor_candidate(data = datos, candidate = "sergio_fajardo")
+```
+
+#### Alejandro Char
+
+```{r, fig.width=8, fig.height=5}
+explor_candidate(data = datos, candidate = "alejandro_char")
+```
+
+#### Federico Gutiérrez
+
+```{r, fig.width=8, fig.height=5}
+explor_candidate(data = datos, candidate = "federico_gutierrez")
+```
+
+#### Juan Manuel Galán
+
+```{r, fig.width=8, fig.height=5}
+explor_candidate(data = datos, candidate = "juan_manuel_galan")
+```
+
+### ¿Normalidad?  {.tabset .tabset-fade .tabset-pills}
+
+#### Escala original
+
+```{r, fig.width=8, fig.height=9}
+datos %>%
+  select(alfredo_saade:federico_gutierrez) %>% 
+  pivot_longer(cols = everything()) %>% 
+  ggplot(aes(sample = value)) +
+  facet_wrap(~name, scales = "free", ncol = 3, nrow = 5) +
+  stat_qq_band() +
+  stat_qq_point() +
+  stat_qq_line() 
+```
+
+#### Escala logarítmica
+
+```{r, fig.width=8, fig.height=9}
+datos %>%
+  select(alfredo_saade:federico_gutierrez) %>% 
+  pivot_longer(cols = everything()) %>% 
+  mutate(value = log10(value)) %>% 
+  ggplot(aes(sample = value)) +
+  facet_wrap(~name, scales = "free", ncol = 3, nrow = 5) +
+  stat_qq_band() +
+  stat_qq_point() +
+  stat_qq_line()
+```
+
+### Inferencia estadística
+
+- En este caso se asume que cada encuesta es una *realización o experimento*, el parámetro de interés es $\mu_p$, que podría ser descrito como el promedio de intención de voto. Esta proporción es de interés estimarla para saber cuál sería el verdadero porcentaje de personas que votaría por un candidato.
+- Se proponen tres métodos para estimar la intención de voto:
+  - **Inferencia clásica original (infer1):** prueba *t-student* para una población. En este caso la variable de interés (proporción) se mantiene en sus unidades originales.
+  - **Inferencia clásica logaritmo (infer2):** prueba *t-student* para una población. En este caso la variable de interés (proporción) se transforma a través de logaritmos.
+  - **Inferencia no paramétrica: Bootstrapping (infer3):** implementación de técnicas de remuestreo no paramétrico para estimación puntual y construcción de intervalos de confianza **promedio** de intención de voto. Intervalos de confianza con el método de percentiles.
+  - **Inferencia no paramétrica: Bootstrapping (infer4):** implementación de técnicas de remuestreo no paramétrico para estimación puntual y construcción de intervalos de confianza para el **promedio** de intención de voto. Intervalos de confianza con el método de error estándar.
+  - **Inferencia no paramétrica: Bootstrapping (infer5):** implementación de técnicas de remuestreo no paramétrico para estimación puntual y construcción de intervalos de confianza para la **mediana** de intención de voto. Intervalos de confianza con el método de percentiles.
+
+```{r}
+# Inferencia clásica original
+res_infer1 <-
+  datos %>%
+  select(alfredo_saade:federico_gutierrez) %>%
+  map(.f = infer1) %>%
+  bind_rows() %>%
+  mutate(candidato = datos %>%
+           select(alfredo_saade:federico_gutierrez) %>%
+           names())
+
+# Inferencia clásica logaritmos
+res_infer2 <-
+  datos %>%
+  select(alfredo_saade:federico_gutierrez) %>%
+  map(.f = infer2) %>%
+  bind_rows() %>%
+  mutate(candidato = datos %>%
+           select(alfredo_saade:federico_gutierrez) %>%
+           names())
+
+# Inferencia Bootstrapping (percentiles)
+
+res_infer3 <-
+  datos %>%
+  select(alfredo_saade:federico_gutierrez) %>%
+  map(.f = infer3) %>%
+  bind_rows() %>%
+  mutate(candidato = datos %>%
+           select(alfredo_saade:federico_gutierrez) %>%
+           names())
+
+# Inferencia Bootstrapping (error estándar)
+res_infer4 <-
+  datos %>%
+  select(alfredo_saade:federico_gutierrez) %>%
+  map(.f = infer4) %>%
+  bind_rows() %>%
+  mutate(candidato = datos %>%
+           select(alfredo_saade:federico_gutierrez) %>%
+           names())
+
+# Inferencia Bootstrapping (error estándar) - mediana
+res_infer5 <-
+  datos %>%
+  select(alfredo_saade:federico_gutierrez) %>%
+  map(.f = infer5) %>%
+  bind_rows() %>%
+  mutate(candidato = datos %>%
+           select(alfredo_saade:federico_gutierrez) %>%
+           names())
+
+# Datos con estimativas finales
+data_estimaciones <-
+  inner_join(x = res_infer1, y = res_infer2, by = "candidato") %>%
+  inner_join(x = ., y = res_infer3, by = "candidato") %>%
+  inner_join(x = ., y = res_infer4, by = "candidato") %>%
+  inner_join(x = ., y = res_infer5, by = "candidato") %>%
+  relocate(candidato, everything()) %>%
+  mutate(across(where(is.numeric), round, digits = 2))
+
+data_estimaciones  %>%
+  datatable(
+    rownames = FALSE,
+    extensions = c('Buttons', "FixedColumns"),
+    options = list(dom = 'Bfrtip',
+                   scrollX = TRUE,
+                   buttons = c('excel'),
+                   fixedColumns = list(leftColumns = 1))
+  )
+```
+
+- Exportando estimaciones finales:
+
+```{r}
+write_csv(x = data_estimaciones, file = "../data/estimaciones_consultas_presidenciales.csv")
+```
+
+- Finalmente se grafican los resultados de las estimaciones:
+
+```{r, fig.width=8, fig.height=7}
+ggplotly(
+  data_estimaciones %>%
+    pivot_longer(cols = -candidato) %>%
+    separate(name, into = c("tipo", "metodo")) %>%
+    pivot_wider(names_from = tipo, values_from = value) %>%
+    ggplot(aes(
+      x = candidato,
+      y = estimate,
+      ymin = li,
+      ymax = ls
+    )) +
+    facet_wrap( ~ metodo, scales = "free", ncol = 2) +
+    geom_point() +
+    geom_errorbar(width = 0.1) +
+    coord_flip() +
+    labs(x = "", y = ""),
+  width = 800,
+  height = 650
+)
+```
+
+
+
+```{r, eval=FALSE, echo=FALSE}
+set.seed(123)
+datos %>% 
+  select(gustavo_petro) %>% 
+  filter(!is.na(gustavo_petro)) %>% 
+  rep_sample_n(size = longitud, replace = TRUE, reps = 10000) %>% 
+  group_by(replicate) %>% 
+  summarise(promedio = mean(gustavo_petro)) %>% 
+  ggplot(aes(x = promedio)) +
+  geom_histogram(color = "black") +
+  labs(x = "Intención de voto (%)", y = "Frecuencia")
+```
+
