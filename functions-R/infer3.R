@@ -14,9 +14,9 @@ infer3 <- function(x, n_reps = 10000) {
     summarise(promedio = mean(value)) %>%
     ungroup() %>%
     summarise(
-      estimate_infer3 = mean(promedio),
-      li_infer3 = quantile(promedio, probs = 0.025),
-      ls_infer3 = quantile(promedio, probs = 0.975)
+      `Intención de voto (%)` = mean(promedio),
+      `L. Inferior` = quantile(promedio, probs = 0.025),
+      `L. Superior` = quantile(promedio, probs = 0.975)
     )
   
   return(res)

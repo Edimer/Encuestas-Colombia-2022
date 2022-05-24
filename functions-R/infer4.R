@@ -14,10 +14,10 @@ infer4 <- function(x, n_reps = 10000) {
     summarise(promedio = mean(value)) %>%
     ungroup() %>%
     summarise(
-      estimate_infer4 = mean(promedio),
+      `Intención de voto (%)` = mean(promedio),
       se = sd(promedio),
-      li_infer4 = estimate_infer4 - (qnorm(p = 0.975) * se),
-      ls_infer4 = estimate_infer4 + (qnorm(p = 0.975) * se)
+      `L. Inferior` = `Intención de voto (%)` - (qnorm(p = 0.975) * se),
+      `L. Superior` = `Intención de voto (%)` + (qnorm(p = 0.975) * se)
     ) %>% 
     select(-se)
   

@@ -25,6 +25,7 @@ library(readxl)
 library(janitor)
 library(DT)
 library(rvest)
+library(lubridate)
 
 theme_set(theme_minimal())
 ```
@@ -37,13 +38,14 @@ library(readxl)
 library(janitor)
 library(DT)
 library(rvest)
+library(lubridate)
 ```
 
 # Funciones
 
-- [Consultar código 1: `clean_data_wikipedia_update.R`]()
-- [Consultar código 2: `clean_variables_string.R`]()
-- [Consultar código 3: `data_final.R`]()
+-   [Consultar código 1: `clean_data_wikipedia_update.R`]()
+-   [Consultar código 2: `clean_variables_string.R`]()
+-   [Consultar código 3: `data_final.R`]()
 
 ```{r}
 source("../functions-R/clean_data_wikipedia_update.R", encoding = "UTF-8")
@@ -55,13 +57,13 @@ source("../functions-R/data_final.R", encoding = "UTF-8")
 
 ## Fuente original
 
-- [Fuente: Anexo:Sondeos de intención de voto para las elecciones presidenciales de Colombia de 2022](https://es.wikipedia.org/wiki/Anexo:Sondeos_de_intenci%C3%B3n_de_voto_para_las_elecciones_presidenciales_de_Colombia_de_2022)
+-   [Fuente: Anexo:Sondeos de intención de voto para las elecciones presidenciales de Colombia de 2022](https://es.wikipedia.org/wiki/Anexo:Sondeos_de_intenci%C3%B3n_de_voto_para_las_elecciones_presidenciales_de_Colombia_de_2022)
 
 ## Web Scraping
 
 ### Lectura de url
 
-- Lectura de información contenida en la página web suministrada.
+-   Lectura de información contenida en la página web suministrada.
 
 ```{r}
 url <- "https://es.wikipedia.org/wiki/Anexo:Sondeos_de_intenci%C3%B3n_de_voto_para_las_elecciones_presidenciales_de_Colombia_de_2022"
@@ -71,7 +73,7 @@ web_info <- url %>%
 web_info
 ```
 
-- Accediendo a la información que está en el *nodo* **body**.
+-   Accediendo a la información que está en el *nodo* **body**.
 
 ```{r}
 web_info %>% 
@@ -80,7 +82,7 @@ web_info %>%
 
 ### Tabla de encuestas (1)
 
-- Se podría generar una base datos con la información de todas las tablas que están presentes en el *body* de la página web. 
+-   Se podría generar una base datos con la información de todas las tablas que están presentes en el *body* de la página web.
 
 ```{r}
 web_info %>% 
@@ -90,10 +92,10 @@ web_info %>%
 
 ### Tabla de encuestas (final)
 
-- La aproximación anterior junta todas las tablas en un solo `data.frame`, pero como no todas las tablas tienen la misma estructura sería más fácil de manipular si se extraen de manera individual y luego se busca la manera correcta de unirlas. Este proceso lo estructura a través de tres funciones:
-  - **`clean_data_wikipedia_update()`:** esta función permite unificar los nombres de las variables y las etiquetas (nombres) del candidato. Este proceso es necesario porque no todos los candidatos fueron evaluados en todas las encuestas (diferente número de variables en cada tabla) y porque no se les asignó el mismo nombre en cada encuesta (etiquetas diferente para el candidato).
-  - **`clean_variable_string()`:** esta función permite eliminar el signo "%" y reemplazar la coma (",") por el punto ("."), para después coercionar las variables a tipo numérico.
-  - **`data_final`:** esta función permite leer múltiples tablas (encuestas) desde un objeto de clase **`xml_document`** (obtenido con la función **`read_html()`** del paqueete *rvest*), unirlas y realizar la depuración final para tener un solo *dataframe* para análisis. Esta función consume las dos funciones anteriores.
+-   La aproximación anterior junta todas las tablas en un solo `data.frame`, pero como no todas las tablas tienen la misma estructura sería más fácil de manipular si se extraen de manera individual y luego se busca la manera correcta de unirlas. Este proceso lo estructura a través de tres funciones:
+    -   **`clean_data_wikipedia_update()`:** esta función permite unificar los nombres de las variables y las etiquetas (nombres) del candidato. Este proceso es necesario porque no todos los candidatos fueron evaluados en todas las encuestas (diferente número de variables en cada tabla) y porque no se les asignó el mismo nombre en cada encuesta (etiquetas diferente para el candidato).
+    -   **`clean_variable_string()`:** esta función permite eliminar el signo "%" y reemplazar la coma (",") por el punto ("."), para después coercionar las variables a tipo numérico.
+    -   **`data_final`:** esta función permite leer múltiples tablas (encuestas) desde un objeto de clase **`xml_document`** (obtenido con la función **`read_html()`** del paqueete *rvest*), unirlas y realizar la depuración final para tener un solo *dataframe* para análisis. Esta función consume las dos funciones anteriores.
 
 ```{r}
 data_encuestas <-
@@ -103,10 +105,8 @@ data_encuestas <-
 data_encuestas
 ```
 
-
 ### Exportando datos
 
 ```{r, eval=FALSE}
 write_csv(x = data_encuestas, file = "../data/EncuestasColombia2022-Update.csv")
 ```
-

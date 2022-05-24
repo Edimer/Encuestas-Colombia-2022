@@ -14,9 +14,9 @@ infer5 <- function(x, n_reps = 10000) {
     summarise(mediana = median(value)) %>%
     ungroup() %>%
     summarise(
-      estimate_infer5 = mean(mediana),
-      li_infer5 = quantile(mediana, probs = 0.025),
-      ls_infer5 = quantile(mediana, probs = 0.975)
+      `Intención de voto (%)` = mean(mediana),
+      `L. Inferior` = quantile(mediana, probs = 0.025),
+      `L. Superior` = quantile(mediana, probs = 0.975)
     )
   
   return(res)

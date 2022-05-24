@@ -31,7 +31,8 @@ data_final <- function(x) {
       c(margen_de_error, blanco, porcentaje),
       clean_variable_string
     ),
-    across(c(margen_de_error, blanco, porcentaje), as.numeric)) %>%
+    across(c(margen_de_error, blanco, porcentaje), as.numeric),
+    fecha = dmy(fecha)) %>%
     distinct(encuesta, fecha, tamano_de_muestra, candidato, .keep_all = TRUE) %>%
     pivot_wider(names_from = candidato, values_from = porcentaje)
   

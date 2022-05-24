@@ -3,15 +3,15 @@ infer2 <- function(x) {
     log1p() %>%
     t.test() %>%
     tidy() %>%
-    select(
-      estimate_infer2 = estimate,
-      li_infer2 = conf.low,
-      ls_infer2 = conf.high
-    ) %>%
     mutate(
-      estimate_infer2 = expm1(estimate_infer2),
-      li_infer2 = exp(li_infer2),
-      ls_infer2 = exp(ls_infer2)
+      estimate = expm1(estimate),
+      conf.low = exp(conf.low),
+      conf.high = exp(conf.high)
+    ) %>%
+    select(
+      `Intención de voto (%)` = estimate,
+      `L. Inferior` = conf.low,
+      `L. Superior` = conf.high
     )
   
   return(res)

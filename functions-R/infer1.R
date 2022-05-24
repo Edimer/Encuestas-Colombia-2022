@@ -4,9 +4,9 @@ infer1 <- function(x) {
     t.test() %>%
     tidy() %>%
     select(
-      estimate_infer1 = estimate,
-      li_infer1 = conf.low,
-      ls_infer1 = conf.high
+      `Intención de voto (%)` = estimate,
+      `L. Inferior` = conf.low,
+      `L. Superior` = conf.high
     )
   
   return(res)
