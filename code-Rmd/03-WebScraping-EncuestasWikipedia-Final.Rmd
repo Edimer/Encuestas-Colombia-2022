@@ -43,9 +43,9 @@ library(lubridate)
 
 # Funciones
 
--   [Consultar código 1: `clean_data_wikipedia_update.R`]()
--   [Consultar código 2: `clean_variables_string.R`]()
--   [Consultar código 3: `data_final.R`]()
+-   [Consultar código 1: `clean_data_wikipedia_update.R`](https://github.com/Edimer/Encuestas-Colombia-2022/blob/encuestas_finales/functions-R/clean_data_wikipedia_update.R)
+-   [Consultar código 2: `clean_variables_string.R`](https://github.com/Edimer/Encuestas-Colombia-2022/blob/encuestas_finales/functions-R/clean_variable_string.R)
+-   [Consultar código 3: `data_final.R`](https://github.com/Edimer/Encuestas-Colombia-2022/blob/encuestas_finales/functions-R/data_final.R)
 
 ```{r}
 source("../functions-R/clean_data_wikipedia_update.R", encoding = "UTF-8")

@@ -31,6 +31,13 @@ library(plotly)
 theme_set(theme_minimal())
 ```
 
+# Documentos previos
+
+Para replicar estos resultados es recomendado ver los siguientes documentos:
+
+- [Extracción de información de encuestas](https://rpubs.com/Edimer/907733)
+- [Exploración de información de encuestas](https://rpubs.com/Edimer/907736)
+
 # Bibliotecas
 
 ```{r}
@@ -45,12 +52,20 @@ library(plotly)
 
 # Funciones
 
+- [Consultar código: `infer1.R`](https://github.com/Edimer/Encuestas-Colombia-2022/blob/encuestas_finales/functions-R/infer1.R)
+- [Consultar código: `infer2.R`](https://github.com/Edimer/Encuestas-Colombia-2022/blob/encuestas_finales/functions-R/infer2.R)
+- [Consultar código: `infer3.R`](https://github.com/Edimer/Encuestas-Colombia-2022/blob/encuestas_finales/functions-R/infer3.R)
+- [Consultar código: `infer4.R`](https://github.com/Edimer/Encuestas-Colombia-2022/blob/encuestas_finales/functions-R/infer4.R)
+- [Consultar código: `infer5.R`](https://github.com/Edimer/Encuestas-Colombia-2022/blob/encuestas_finales/functions-R/infer5.R)
+- [Consultar código: `test_infer.R`](https://github.com/Edimer/Encuestas-Colombia-2022/blob/encuestas_finales/functions-R/test_infer.R)
+
 ```{r}
 source("../functions-R/infer1.R", encoding = "UTF-8")
 source("../functions-R/infer2.R", encoding = "UTF-8")
 source("../functions-R/infer3.R", encoding = "UTF-8")
 source("../functions-R/infer4.R", encoding = "UTF-8")
 source("../functions-R/infer5.R", encoding = "UTF-8")
+source("../functions-R/infer6.R", encoding = "UTF-8")
 source("../functions-R/test_infer.R", encoding = "UTF-8")
 ```
 
@@ -87,89 +102,16 @@ datos
 ### Estimación
 
 - En este caso se asume que cada encuesta es una *realización o experimento*, el parámetro de interés es $\mu_p$, que podría ser descrito como el promedio de intención de voto. Esta proporción es de interés estimarla para saber cuál sería el verdadero porcentaje de personas que votaría por un candidato.
-- Se proponen tres métodos para estimar la intención de voto:
+- Se proponen cinco métodos para estimar la intención de voto:
   - **Inferencia clásica original (infer1):** prueba *t-student* para una población. En este caso la variable de interés (proporción) se mantiene en sus unidades originales.
   - **Inferencia clásica logaritmo (infer2):** prueba *t-student* para una población. En este caso la variable de interés (proporción) se transforma a través de logaritmos.
   - **Inferencia no paramétrica: Bootstrapping (infer3):** implementación de técnicas de remuestreo no paramétrico para estimación puntual y construcción de intervalos de confianza **promedio** de intención de voto. Intervalos de confianza con el método de percentiles.
   - **Inferencia no paramétrica: Bootstrapping (infer4):** implementación de técnicas de remuestreo no paramétrico para estimación puntual y construcción de intervalos de confianza para el **promedio** de intención de voto. Intervalos de confianza con el método de error estándar.
   - **Inferencia no paramétrica: Bootstrapping (infer5):** implementación de técnicas de remuestreo no paramétrico para estimación puntual y construcción de intervalos de confianza para la **mediana** de intención de voto. Intervalos de confianza con el método de percentiles.
+  - **Inferencia no paramétrica: Bootstrapping (infer6):** implementación de técnicas de remuestreo no paramétrico para estimación puntual y construcción de intervalos de confianza para el **máximo** de intención de voto. Intervalos de confianza con el método de percentiles.  
 
 ```{r}
-tabla_infer <- test_infer(n_reps = 10000)
+tabla_infer <- test_infer(n_reps = 10000) %>% 
+  relocate(Candidato, Método, everything())
 tabla_infer
 ```
-
-<!-- # Pruebas -->
-
-
-<!-- ```{r} -->
-<!-- media_candidato <- -->
-<!--   datos %>%  -->
-<!--   pull(gustavo_petro) %>%  -->
-<!--   mean(na.rm = TRUE) -->
-
-<!-- media_candidato -->
-
-<!-- desvi_candidato <- -->
-<!--   datos %>%  -->
-<!--   pull(gustavo_petro) %>%  -->
-<!--   sd(na.rm = TRUE) -->
-
-<!-- desvi_candidato -->
-<!-- ``` -->
-
-<!-- $$P(X >= 51)$$ -->
-
-<!-- ```{r} -->
-<!-- pnorm(q = 51, mean = 34.05121, sd = 11.26968, lower.tail = FALSE) -->
-
-<!-- 1 - pnorm(q = 51, mean = 34.05121, sd = 11.26968, lower.tail = TRUE) -->
-<!-- ``` -->
-
-<!-- ```{r} -->
-<!-- valor_z <- (51 - media_candidato) / desvi_candidato -->
-<!-- valor_z -->
-
-<!-- pnorm(q = valor_z, mean = 0, sd = 1, lower.tail = FALSE) -->
-
-<!-- 1 - pnorm(q = valor_z, mean = 0, sd = 1, lower.tail = TRUE) -->
-<!-- ``` -->
-
-
-<!-- # Inductivo -->
-
-<!-- $$H_0: \mu_{p} = 51 \\ H_1: \mu_{p}  \neq 51$$ -->
-
-<!-- ```{r} -->
-<!-- proporcion_candidato <- datos %>%  -->
-<!--   pull(gustavo_petro) %>%  -->
-<!--   na.omit() -->
-
-<!-- prueba_t <- t.test( -->
-<!--   x = proporcion_candidato, -->
-<!--   alternative = "two.sided", -->
-<!--   conf.level = 0.95, -->
-<!--   mu = 51  -->
-<!-- ) -->
-
-<!-- prueba_t -->
-<!-- ``` -->
-
-
-<!-- - Prueba para la varianza: -->
-
-<!-- ```{r} -->
-<!-- pnorm(q = 51, mean = 37.01442, sd = 11.26968, lower.tail = FALSE) -->
-<!-- ``` -->
-
-<!-- ```{r} -->
-<!-- val1 <- pnorm(q = 30, mean = 37.01442, sd = 11.26968, lower.tail = TRUE) -->
-
-<!-- val2 <- pnorm(q = 40, mean = 37.01442, sd = 11.26968, lower.tail = TRUE) -->
-
-<!-- val2 - val1 -->
-
-<!-- pnorm(q = 40, mean = 37.01442, sd = 11.26968, lower.tail = FALSE) -->
-
-<!-- 0.7331656 - 0.395535  -->
-<!-- ``` -->

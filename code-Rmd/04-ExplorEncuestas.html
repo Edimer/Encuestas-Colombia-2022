@@ -11,7 +11,7 @@
 
 <meta name="author" content="Edimer David Jaramillo" />
 
-<meta name="date" content="2022-05-23" />
+<meta name="date" content="2022-05-28" />
 
 <title>Intención de voto elecciones presidenciales Colombia 2022</title>
 
@@ -2976,7 +2976,7 @@ div.tocify {
 Colombia 2022</h1>
 <h3 class="subtitle">Exploración estadística</h3>
 <h4 class="author">Edimer David Jaramillo</h4>
-<h4 class="date">2022-05-23</h4>
+<h4 class="date">2022-05-28</h4>
 
 </div>
 
@@ -2999,6 +2999,18 @@ Colombia 2022</h1>
 </div>
 <div id="funciones" class="section level1">
 <h1>Funciones</h1>
+<ul>
+<li><a href="https://github.com/Edimer/Encuestas-Colombia-2022/blob/encuestas_finales/functions-R/plot_distribution.R">Consultar
+código: <code>plot_distribution.R</code></a></li>
+<li><a href="https://github.com/Edimer/Encuestas-Colombia-2022/blob/encuestas_finales/functions-R/plot_time.R">Consultar
+código: <code>plot_time.R</code></a></li>
+<li><a href="https://github.com/Edimer/Encuestas-Colombia-2022/blob/encuestas_finales/functions-R/plot_cor.R">Consultar
+código: <code>plot_cor.R</code></a></li>
+<li><a href="https://github.com/Edimer/Encuestas-Colombia-2022/blob/encuestas_finales/functions-R/plot_scatter.R">Consultar
+código: <code>plot_scatter.R</code></a></li>
+<li><a href="https://github.com/Edimer/Encuestas-Colombia-2022/blob/encuestas_finales/functions-R/plot_encuestas.R">Consultar
+código: <code>plot_encuestas.R</code></a></li>
+</ul>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&quot;../functions-R/plot_distribution.R&quot;</span>, <span class="at">encoding =</span> <span class="st">&quot;UTF-8&quot;</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&quot;../functions-R/plot_time.R&quot;</span>, <span class="at">encoding =</span> <span class="st">&quot;UTF-8&quot;</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&quot;../functions-R/plot_cor.R&quot;</span>, <span class="at">encoding =</span> <span class="st">&quot;UTF-8&quot;</span>)</span>
@@ -3007,6 +3019,13 @@ Colombia 2022</h1>
 </div>
 <div id="datos" class="section level1">
 <h1>Datos</h1>
+<ul>
+<li><a href="https://github.com/Edimer/Encuestas-Colombia-2022/blob/encuestas_finales/data/EncuestasColombia2022-Update.csv">Base
+de datos</a></li>
+<li>Puede ver el <a href="https://rpubs.com/Edimer/907733">documento</a>
+con la información necesaria para la extracción de datos desde
+Wikipedia.</li>
+</ul>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>datos <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;../data/EncuestasColombia2022-Update.csv&quot;</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">encuesta =</span> <span class="fu">str_to_lower</span>(encuesta),</span>

@@ -63,6 +63,12 @@ library(plotly)
 
 # Funciones
 
+-   [Consultar código: `plot_distribution.R`](https://github.com/Edimer/Encuestas-Colombia-2022/blob/encuestas_finales/functions-R/plot_distribution.R)
+-   [Consultar código: `plot_time.R`](https://github.com/Edimer/Encuestas-Colombia-2022/blob/encuestas_finales/functions-R/plot_time.R)
+-   [Consultar código: `plot_cor.R`](https://github.com/Edimer/Encuestas-Colombia-2022/blob/encuestas_finales/functions-R/plot_cor.R)
+-   [Consultar código: `plot_scatter.R`](https://github.com/Edimer/Encuestas-Colombia-2022/blob/encuestas_finales/functions-R/plot_scatter.R)
+-   [Consultar código: `plot_encuestas.R`](https://github.com/Edimer/Encuestas-Colombia-2022/blob/encuestas_finales/functions-R/plot_encuestas.R)
+
 ```{r}
 source("../functions-R/plot_distribution.R", encoding = "UTF-8")
 source("../functions-R/plot_time.R", encoding = "UTF-8")
@@ -73,6 +79,9 @@ source("../functions-R/plot_encuestas.R", encoding = "UTF-8")
 
 
 # Datos
+
+- [Base de datos](https://github.com/Edimer/Encuestas-Colombia-2022/blob/encuestas_finales/data/EncuestasColombia2022-Update.csv)
+- Puede ver el [documento](https://rpubs.com/Edimer/907733) con la información necesaria para la extracción de datos desde Wikipedia.
 
 ```{r}
 datos <- read_csv("../data/EncuestasColombia2022-Update.csv") %>%
