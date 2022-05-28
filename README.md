@@ -4,6 +4,8 @@
 - Puede consultar el [documento con ejemplo de extracción de información.](https://rpubs.com/Edimer/907733)
 - Puede consultar el [documento con resultados de análisis exploratorio.](https://rpubs.com/Edimer/907736)
 - Puede consultar el [documento con resultados de análisis inferencial.](https://rpubs.com/Edimer/907795)
+- La base de datos puede ser consultada [aquí.](https://github.com/Edimer/Encuestas-Colombia-2022/blob/main/data/EncuestasColombia2022-Update.csv)
+- La base de datos con las estimaciones de intención de voto puede ser consultada[aquí](https://github.com/Edimer/Encuestas-Colombia-2022/blob/main/data/estimaciones-finales.csv)
 
 # Bibliotecas de R
 
