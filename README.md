@@ -1,8 +1,9 @@
 # Encuestas consultas presidenciales Colombia 2022
 
 - Los datos usados para este ejemplo de análisis estadístico están disponibles en [Anexo:Sondeos de intención de voto para las elecciones presidenciales de Colombia de 2022.](https://es.wikipedia.org/wiki/Anexo:Sondeos_de_intenci%C3%B3n_de_voto_para_las_elecciones_presidenciales_de_Colombia_de_2022)
-- Puede consultar el [documento con ejemplo de extracción de información.](https://rpubs.com/Edimer/877105)
-- Puede consultar el [documento con resultados de análisis estadístico.](https://rpubs.com/Edimer/877110)
+- Puede consultar el [documento con ejemplo de extracción de información.](https://rpubs.com/Edimer/907733)
+- Puede consultar el [documento con resultados de análisis exploratorio.](https://rpubs.com/Edimer/907736)
+- Puede consultar el [documento con resultados de análisis inferencial.](https://rpubs.com/Edimer/907795)
 
 # Bibliotecas de R
 
