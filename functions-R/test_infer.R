@@ -49,5 +49,16 @@ test_infer <- function(n_reps = 100) {
           across(where(is.numeric), round, digits = 2),
           Método = "BootMediana-ICQ"
         )
+    ) %>% 
+    bind_rows(
+      datos %>%
+        select(all_of(candidatos)) %>%
+        map(.f = ~ infer6(x = .x, n_reps = n_reps)) %>%
+        bind_rows() %>%
+        mutate(
+          Candidato = candidatos,
+          across(where(is.numeric), round, digits = 2),
+          Método = "BootMáximo-ICQ"
+        )
     )
 }
