@@ -1,0 +1,13 @@
+name: EstimadorVotos
+title: EstimadorVotos
+username:
+account: edimer-david-jaramillo
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 6390754
+bundleId: 5955915
+url: https://edimer-david-jaramillo.shinyapps.io/EstimadorVotos/
+when: 1653784677.61269
+lastSyncTime: 1653784677.61269
+asMultiple: FALSE
+asStatic: FALSE
